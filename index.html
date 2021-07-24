@@ -156,7 +156,9 @@
       <div class="container">
         <div class="user-container row mx-auto mt-5">
           <div class="col-12 switch-container mb-3 d-flex justify-content-end">
-            <button class="btn btn-success" @click="switchUsers">Switch</button>
+            <button class="btn btn-success" @click="fetchUsers()">
+              Switch
+            </button>
           </div>
           <div
             v-for="user in users"
@@ -179,13 +181,16 @@
                     mt-3
                     btn-add-favorite
                   "
-                  @click="likeUser"
-                  :data-id="user.login.uuid"
+                  @click="likeUser()"
+                  :data-id="user.id"
                 ></i>
               </div>
-              <div class="user-img d-flex justify-content-center px-5 py-3">
+              <div
+                class="user-img d-flex justify-content-center px-5 py-3"
+                @click="getUserData(user)"
+              >
                 <img
-                  :src="user.picture.large"
+                  :src="user.img"
                   class="
                     img-show-user
                     btn-show-user
@@ -197,13 +202,13 @@
                   alt="..."
                   data-bs-toggle="modal"
                   data-bs-target="#user-modal"
-                  :data-id="user.login.uuid"
+                  :data-id="user.id"
                 />
               </div>
               <div class="card-body d-flex flex-column justify-content-between">
                 <div class="user-info">
                   <h5 class="card-title text-center">
-                    {{user.name.first}} {{user.name.last}}
+                    {{user.name}}
                     <i
                       v-if="user.gender === 'female'"
                       class="fas fa-venus ms-2"
@@ -219,10 +224,10 @@
                 <div class="btn-container d-flex justify-content-center mt-2">
                   <button
                     class="btn btn-secondary btn-show-user me-3"
-                    @click="getUserData"
+                    @click="getUserData(user)"
                     data-bs-toggle="modal"
                     data-bs-target="#user-modal"
-                    :data-id="user.login.uuid"
+                    :data-id="user.id"
                   >
                     Info
                   </button>
@@ -310,7 +315,6 @@
         data() {
           return {
             users: [],
-            usersMap: {},
             user: {}
           }
         },
@@ -319,55 +323,29 @@
             event.target.classList.toggle('far')
             event.target.classList.toggle('fas')
           },
-          getUserData() {
-            const userId = event.target.dataset.id
-            this.user = this.usersMap[userId]
+          getUserData(user) {
+            this.user = user
           },
-          async switchUsers() {
+          async fetchUsers() {
             const result = await axios.get(
               'https://randomuser.me/api/?inc=gender,name,nat,picture,email,login,dob&results=20'
             )
 
-            this.users = result.data.results
-            this.usersMap = {}
-            this.users.forEach(
-              user =>
-                (this.usersMap[user.login.uuid] = {
-                  name: `${user.name.first} ${user.name.last}`,
-                  img: user.picture.large,
-                  nat: user.nat,
-                  email: user.email,
-                  gender: user.gender,
-                  birthday: user.dob.date.substring(
-                    0,
-                    user.dob.date.indexOf('T')
-                  ),
-                  age: user.dob.age
-                })
-            )
+            const users = result.data.results
+            this.users = users.map(user => ({
+              id: user.login.uuid,
+              name: `${user.name.first} ${user.name.last}`,
+              img: user.picture.large,
+              nat: user.nat,
+              email: user.email,
+              gender: user.gender,
+              birthday: user.dob.date.substring(0, user.dob.date.indexOf('T')),
+              age: user.dob.age
+            }))
           }
         },
         async mounted() {
-          const result = await axios.get(
-            'https://randomuser.me/api/?inc=gender,name,nat,picture,email,login,dob&results=20&seed=foobar'
-          )
-
-          this.users = result.data.results
-          this.users.forEach(
-            user =>
-              (this.usersMap[user.login.uuid] = {
-                name: `${user.name.first} ${user.name.last}`,
-                img: user.picture.large,
-                nat: user.nat,
-                email: user.email,
-                gender: user.gender,
-                birthday: user.dob.date.substring(
-                  0,
-                  user.dob.date.indexOf('T')
-                ),
-                age: user.dob.age
-              })
-          )
+          this.fetchUsers()
         }
       }).mount('#app')
     </script>
