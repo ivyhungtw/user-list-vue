@@ -31,6 +31,13 @@
           "
         >
           <div class="card pb-2" style="width: 18rem">
+            <div class="add mx-4 mt-2 d-flex justify-content-end">
+              <i
+                class="far fa-heart fa-lg heart mt-3 btn-add-favorite"
+                @click="likeUser"
+                data-id=""
+              ></i>
+            </div>
             <div class="user-img px-5 py-3">
               <img
                 :src="user.picture.large"
@@ -76,7 +83,12 @@
             users: []
           }
         },
-        methods: {},
+        methods: {
+          likeUser() {
+            event.target.classList.toggle('far')
+            event.target.classList.toggle('fas')
+          }
+        },
         async mounted() {
           const result = await axios.get(
             'https://randomuser.me/api/?inc=gender,name,nat,picture,email&results=20&seed=foobar'
