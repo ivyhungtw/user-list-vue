@@ -35,7 +35,7 @@
               <i
                 class="far fa-heart fa-lg heart mt-3 btn-add-favorite"
                 @click="likeUser"
-                data-id=""
+                :data-id="user.login.uuid"
               ></i>
             </div>
             <div class="user-img px-5 py-3">
@@ -50,20 +50,96 @@
                   img-fluid
                 "
                 alt="..."
+                data-bs-toggle="modal"
+                data-bs-target="#user-modal"
+                :data-id="user.login.uuid"
               />
             </div>
-            <div class="card-body">
-              <h5 class="card-title">
-                {{user.name.first}} {{user.name.last}}
-                <i v-if="user.gender === 'female'" class="fas fa-venus"></i>
-                <i v-else class="fas fa-mars"></i>
-              </h5>
+            <div class="card-body d-flex flex-column justify-content-between">
               <div class="user-info">
+                <h5 class="card-title">
+                  {{user.name.first}} {{user.name.last}}
+                  <i v-if="user.gender === 'female'" class="fas fa-venus"></i>
+                  <i v-else class="fas fa-mars"></i>
+                </h5>
+
                 <div class="card-text pb-2">Gender: {{user.gender}}</div>
                 <div class="card-text pb-2">Nationality: {{user.nat}}</div>
                 <div class="card-text pb-2">Email: {{user.email}}</div>
               </div>
+              <div class="btn-container d-flex justify-content-end">
+                <button
+                  class="btn btn-primary btn-show-user me-3"
+                  @click="getUserData"
+                  data-bs-toggle="modal"
+                  data-bs-target="#user-modal"
+                  :data-id="user.login.uuid"
+                >
+                  More
+                </button>
+              </div>
               <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="user-modal"
+          tabindex="-1"
+          aria-labelledby="user-modalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="user-modalLabel">{{user.name}}</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div
+                    class="
+                      col-md-4
+                      d-flex
+                      justify-content-center
+                      align-items-center
+                      ml-4
+                    "
+                    id="user-modal-img"
+                  >
+                    <img :src="user.img" alt="User Photo" />
+                  </div>
+                  <div class="col">
+                    <ul
+                      class="list-group list-group-flush"
+                      id="user-modal-info"
+                    >
+                      <li class="list-group-item">Gender: {{user.gender}}</li>
+                      <li class="list-group-item">Nationality: {{user.nat}}</li>
+                      <li class="list-group-item">Age: {{user.age}}</li>
+                      <li class="list-group-item">
+                        Birthday: {{user.birthday}}
+                      </li>
+                      <li class="list-group-item">Email: {{user.email}}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -80,21 +156,42 @@
       Vue.createApp({
         data() {
           return {
-            users: []
+            users: [],
+            usersMap: {},
+            user: {}
           }
         },
         methods: {
           likeUser() {
             event.target.classList.toggle('far')
             event.target.classList.toggle('fas')
+          },
+          getUserData() {
+            const userId = event.target.dataset.id
+            this.user = this.usersMap[userId]
           }
         },
         async mounted() {
           const result = await axios.get(
-            'https://randomuser.me/api/?inc=gender,name,nat,picture,email&results=20&seed=foobar'
+            'https://randomuser.me/api/?inc=gender,name,nat,picture,email,login,dob&results=20&seed=foobar'
           )
 
           this.users = result.data.results
+          this.users.forEach(
+            user =>
+              (this.usersMap[user.login.uuid] = {
+                name: `${user.name.first} ${user.name.last}`,
+                img: user.picture.large,
+                nat: user.nat,
+                email: user.email,
+                gender: user.gender,
+                birthday: user.dob.date.substring(
+                  0,
+                  user.dob.date.indexOf('T')
+                ),
+                age: user.dob.age
+              })
+          )
         }
       }).mount('#app')
     </script>
