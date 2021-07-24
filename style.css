@@ -1,0 +1,36 @@
+body {
+  background-color: #cfe0e0;
+}
+
+/* Nav */
+.header nav {
+  background-color: #c4e1e1d9;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+}
+
+/* User List */
+.user-container img {
+  border: 4px solid #c4e1e1;
+}
+
+.img-show-user {
+  width: 85%;
+  cursor: pointer;
+  transition: transform 0.5s ease;
+}
+
+.img-show-user:hover {
+  transform: scale(1.2);
+}
+
+/* Card */
+.card {
+  box-shadow: 4px 5px 10px rgba(58, 58, 58, 0.336);
+  border: none;
+}
+
+.card:hover {
+  box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.39);
+}
