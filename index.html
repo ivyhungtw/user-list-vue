@@ -150,10 +150,14 @@
           </a>
         </div>
       </header>
+      <!-- Switch Button -->
+
       <!-- User List -->
       <div class="container">
-        <div></div>
         <div class="user-container row mx-auto mt-5">
+          <div class="col-12 switch-container mb-3 d-flex justify-content-end">
+            <button class="btn btn-success" @click="switchUsers">Switch</button>
+          </div>
           <div
             v-for="user in users"
             class="
@@ -318,6 +322,29 @@
           getUserData() {
             const userId = event.target.dataset.id
             this.user = this.usersMap[userId]
+          },
+          async switchUsers() {
+            const result = await axios.get(
+              'https://randomuser.me/api/?inc=gender,name,nat,picture,email,login,dob&results=20'
+            )
+
+            this.users = result.data.results
+            this.usersMap = {}
+            this.users.forEach(
+              user =>
+                (this.usersMap[user.login.uuid] = {
+                  name: `${user.name.first} ${user.name.last}`,
+                  img: user.picture.large,
+                  nat: user.nat,
+                  email: user.email,
+                  gender: user.gender,
+                  birthday: user.dob.date.substring(
+                    0,
+                    user.dob.date.indexOf('T')
+                  ),
+                  age: user.dob.age
+                })
+            )
           }
         },
         async mounted() {
