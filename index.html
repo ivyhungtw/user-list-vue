@@ -172,18 +172,15 @@
           >
             <div class="card pb-2" style="width: 18rem">
               <div class="add mx-4 mt-2 d-flex justify-content-end">
-                <i
-                  class="
-                    text-danger
-                    far
-                    fa-heart fa-lg
-                    heart
-                    mt-3
-                    btn-add-favorite
-                  "
-                  @click="likeUser($event)"
+                <button
+                  type="button"
+                  class="fav-btn text-danger mt-3 heart btn-add-favorite"
+                  @click="likeUser(user)"
                   :data-id="user.id"
-                ></i>
+                >
+                  <i class="far fa-heart fa-lg" v-if="!user.isLiked"></i>
+                  <i class="fas fa-heart fa-lg" v-else></i>
+                </button>
               </div>
               <div
                 class="user-img d-flex justify-content-center px-5 py-3"

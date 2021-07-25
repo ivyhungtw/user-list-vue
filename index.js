@@ -6,9 +6,8 @@ const app = {
     }
   },
   methods: {
-    likeUser(event) {
-      event.target.classList.toggle('far')
-      event.target.classList.toggle('fas')
+    likeUser(user) {
+      user.isLiked = !user.isLiked
     },
     getUserData(user) {
       this.user = user
