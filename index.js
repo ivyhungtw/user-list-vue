@@ -2,12 +2,29 @@ const app = {
   data() {
     return {
       users: [],
-      user: {}
+      user: {},
+      favUsers: JSON.parse(localStorage.getItem('favUsers')) || []
     }
   },
   methods: {
-    likeUser(user) {
+    toggleFavUser(user) {
+      let userId = user.id
+      const index = this.favUsers.findIndex(user => user.id === userId)
+
+      if (!user.isLiked) {
+        // Add user to favorite list
+        if (index !== -1) {
+          return (user.isLiked = true)
+        }
+        this.favUsers.push(user)
+      } else {
+        // Remove user from favorite list
+        if (index === -1) return (user.isLiked = false)
+        this.favUsers.splice(index, 1)
+      }
+
       user.isLiked = !user.isLiked
+      localStorage.setItem('favUsers', JSON.stringify(this.favUsers))
     },
     getUserData(user) {
       this.user = user
@@ -27,7 +44,8 @@ const app = {
         gender: user.gender,
         birthday: user.dob.date.substring(0, user.dob.date.indexOf('T')),
         age: user.dob.age,
-        googleMapUrl: `https://maps.google.com/maps?f=q&geocode=&q=${user.location.coordinates.latitude},${user.location.coordinates.longitude}&z=10&output=embed`
+        googleMapUrl: `https://maps.google.com/maps?f=q&geocode=&q=${user.location.coordinates.latitude},${user.location.coordinates.longitude}&z=10&output=embed`,
+        isLiked: this.favUsers.some(favUser => favUser.id === user.login.uuid)
       }))
     }
   },
